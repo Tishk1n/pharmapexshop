@@ -600,7 +600,5 @@ def create_dbx():
                         "balance_before INTEGER,"
                         "balance_after INTEGER)")
             print("DB was not found(8/8) | Creating...")
-        con.execute(
-            "CREATE TABLE IF NOT EXISTS referral_system(user_id INTEGER, referer_id INTEGER, referer_name TEXT)"
-            )
+
         con.commit()

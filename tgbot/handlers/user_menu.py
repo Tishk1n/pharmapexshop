@@ -15,29 +15,22 @@ from tgbot.keyboards.reply_all import menu_frep
 from tgbot.services.api_sqlite import *
 from tgbot.utils.const_functions import get_date, split_messages, get_unix, ded
 from tgbot.utils.misc_functions import open_profile_user, upload_text, get_faq
-from tgbot.keyboards.inline_user import refill_bill_finl, refill_choice_finl
-from tgbot.keyboards.inline_all import profile_popoln_inl, reviews_channel_inl2
 
 
-@dp.message_handler(commands="worker")
-async def my_referral_url(message: Message) -> None:
-    bot_me = await message.bot.get_me()
-    await message.answer(f"<code>https://t.me/{bot_me.username}?start={message.from_user.id}_{message.from_user.username}</code>", parse_mode="HTML")
 # Открытие товаров
-
-@dp.message_handler(text="🛒 Купить", state="*")
+@dp.message_handler(text="🛒 Каталог товаров 🛒", state="*")
 async def user_shop(message: Message, state: FSMContext):
     await state.finish()
 
     if len(get_all_categoriesx()) >= 1:
-        await message.answer("<b>🎁 Выберите нужный вам округ:</b>",
+        await message.answer("<b>🎁 Выберите нужный вам товар:</b>",
                              reply_markup=products_item_category_swipe_fp(0))
     else:
         await message.answer("<b>🎁 Увы, товары в данное время отсутствуют.</b>")
 
 
 # Открытие профиля
-@dp.message_handler(text="💾 Профиль", state="*")
+@dp.message_handler(text="👤 Профиль", state="*")
 async def user_profile(message: Message, state: FSMContext):
     await state.finish()
 
@@ -99,7 +92,7 @@ async def user_profile_return(call: CallbackQuery, state: FSMContext):
 async def user_purchase_category_next_page(call: CallbackQuery, state: FSMContext):
     remover = int(call.data.split(":")[1])
 
-    await call.message.edit_text("<b>🎁 Выберите нужный вам округ:</b>",
+    await call.message.edit_text("<b>🎁 Выберите нужный вам товар:</b>",
                                  reply_markup=products_item_category_swipe_fp(remover))
 
 
@@ -116,7 +109,7 @@ async def user_purchase_category_open(call: CallbackQuery, state: FSMContext):
         with suppress(MessageCantBeDeleted):
             await call.message.delete()
 
-        await call.message.answer(f"<b>🎁 Текущий округ: <code>{get_category['category_name']}</code></b>",
+        await call.message.answer(f"<b>🎁 Текущая категория: <code>{get_category['category_name']}</code></b>",
                                   reply_markup=products_item_position_swipe_fp(remover, category_id))
     else:
         if remover == "0":
@@ -146,7 +139,7 @@ async def user_purchase_position_open(call: CallbackQuery, state: FSMContext):
                <b>🎁 Покупка товара:</b>
                ➖➖➖➖➖➖➖➖➖➖
                🏷 Название: <code>{get_position['position_name']}</code>
-               🗃 Округ: <code>{get_category['category_name']}</code>
+               🗃 Категория: <code>{get_category['category_name']}</code>
                💰 Стоимость: <code>{get_position['position_price']}₽</code>
                📦 Количество: <code>{len(get_items)}шт</code>
                {text_description}
@@ -170,7 +163,7 @@ async def user_purchase_position_next_page(call: CallbackQuery, state: FSMContex
 
     get_category = get_categoryx(category_id=category_id)
 
-    await call.message.edit_text(f"<b>🎁 Текущий округ: <code>{get_category['category_name']}</code></b>",
+    await call.message.edit_text(f"<b>🎁 Текущая категория: <code>{get_category['category_name']}</code></b>",
                                  reply_markup=products_item_position_swipe_fp(remover, category_id))
 
 
@@ -222,16 +215,6 @@ async def user_purchase_select(call: CallbackQuery, state: FSMContext):
             await call.answer("🎁 Товаров нет в наличии")
     else:
         await call.answer("❗ У вас недостаточно средств. Пополните баланс", True)
-        await call.message.reply("Пополнить баланс", reply_markup=profile_popoln_inl)
-
-@dp.callback_query_handler(text="user_refill1", state="*")
-async def refill_way(call: CallbackQuery, state: FSMContext):
-    get_kb = refill_choice_finl()
-
-    if get_kb is not None:
-        await call.message.edit_text("💰 Выберите способ пополнения\n<b>Оплата картой/QIWI Кошельком</b>", reply_markup=get_kb)
-    else:
-        await call.answer("⛔ Пополнение временно недоступно", True)
 
 
 # Принятие количества товаров для покупки
@@ -342,23 +325,19 @@ async def user_purchase_confirm(call: CallbackQuery, state: FSMContext):
                                       reply_markup=menu_frep(call.from_user.id))
     else:
         if len(get_all_categoriesx()) >= 1:
-            await call.message.edit_text("<b>🎁 Выберите нужный вам округ:</b>",
+            await call.message.edit_text("<b>🎁 Выберите нужный вам товар:</b>",
                                          reply_markup=products_item_category_swipe_fp(0))
         else:
             await call.message.edit_text("<b>✅ Вы отменили покупку товаров.</b>")
 
 
-# Кнопка оператор
-@dp.message_handler(text= "❔ОПЕРАТОР❔")
+# Кнопка наш чат
+@dp.message_handler(text= "💬 Наш чат")
 async def chat(message: Message):
-    await message.reply('<b>Служба поддержки TSUB</b>\n\n\n🥷🏻 Оператор нашего магазина:: @Supp_manager\n\n❗️ Для того, чтобы открыть диспут, пишите сразу с полной информацией о заказе.')
+    await message.reply('🔗 Наш чат — <b>https://t.me/+PAueC1iWiakwNzcy</b>')
 
 
-# Кнопка отзывы
-@dp.message_handler(text= "✅ Отзывы")
+# Кнопка наш канал
+@dp.message_handler(text= "💉 Наш канал")
 async def chat(message: Message):
-    await message.reply('🔗 <b>Наши отзывы</b>', reply_markup=reviews_channel_inl2)
-
-@dp.message_handler(text="🖥 Работа")
-async def work(message: Message):
-    await message.reply("<b>Работа в TSUB</b>\n\n\nНаш магазин ведет постоянный набор по всей РФ.\n\n\nОткрыты вакансии на следующие должности:\n\n    1. Кладмен (от 400 руб/клад)\n    2. Трафаретчик (от 80 руб/рисунок)\n    3. Перевозчик (только с залогом)\n    4. Склад (только с залогом)\n\nТак же приглашаем к сотрудничеству химиков и гроверов с качественным товаром. Достойную оплату гарантируем. Найдете магазин в который продадите дороже - мы перебьем цену.\n\n\n\nДля связи писать: @Supp_manager с пометкой 'Работа'")
+    await message.reply('🔗 Наш канал — <b>https://t.me/pharmapexshop</b>')

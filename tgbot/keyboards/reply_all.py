@@ -7,16 +7,14 @@ from tgbot.data.config import get_admins
 # Кнопки главного меню
 def menu_frep(user_id):
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-    keyboard.row("🛒 Купить", "💾 Профиль")
-    keyboard.row("🖥 Работа")
-    keyboard.row("❔ОПЕРАТОР❔", "✅ Отзывы")
-    
-    return keyboard
+    keyboard.row("🛒 Каталог товаров 🛒")
+    keyboard.row("👤 Профиль")
+    keyboard.row("ℹ️ Информация и правила")
+    keyboard.row("💬 Наш чат", "💉 Наш канал")
+    #keyboard.row("🎁 Купить", "👤 Профиль", "🧮 Наличие товаров")
+    #keyboard.row("☎ Поддержка", "ℹ FAQ")
 
-
-def admin_kb(user_id):
     if user_id in get_admins():
-        keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
         keyboard.row("🎁 Управление товарами", "📊 Статистика")
         keyboard.row("⚙ Настройки", "🔆 Общие функции", "🔑 Платежные системы")
 
@@ -26,7 +24,7 @@ def admin_kb(user_id):
 # Кнопки платежных систем
 def payments_frep():
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-    keyboard.row("🥝 Изменить QIWI 🖍", "Изменить Bitcoin", "Изменить карту")
+    keyboard.row("🥝 Изменить QIWI 🖍", "🥝 Проверить QIWI ♻", "🥝 Баланс QIWI 👁")
     keyboard.row("⬅ Главное меню", "🖲 Способы пополнений")
 
     return keyboard
@@ -35,7 +33,7 @@ def payments_frep():
 # Кнопки общих функций
 def functions_frep(user_id):
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-    keyboard.row("👤 Поиск профиля 🔍", "📢 Рассылка")
+    keyboard.row("👤 Поиск профиля 🔍", "📢 Рассылка", "🧾 Поиск чеков 🔍")
     keyboard.row("⬅ Главное меню")
 
     return keyboard

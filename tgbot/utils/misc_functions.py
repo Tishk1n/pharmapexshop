@@ -16,6 +16,8 @@ from tgbot.utils.const_functions import get_unix, convert_day, get_date, ded
 
 
 
+
+
 # Рассылка сообщения всем администраторам
 async def send_admins(message, markup=None, not_me=0):
     for admin in get_admins():
@@ -188,7 +190,6 @@ def open_profile_user(user_id):
     return ded(f"""
            <b>👤 Ваш профиль:</b>
            ➖➖➖➖➖➖➖➖➖➖
-           🔗 Ваша реферальная ссылка: 
            🆔 ID: <code>{get_user['user_id']}</code>
            💰 Баланс: <code>{get_user['user_balance']}₽</code>
            🎁 Куплено товаров: <code>{count_items}шт</code>

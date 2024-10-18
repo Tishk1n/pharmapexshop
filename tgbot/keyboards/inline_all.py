@@ -8,27 +8,11 @@ mail_confirm_inl = InlineKeyboardMarkup(
     InlineKeyboardButton("❌ Отменить", callback_data="confirm_mail:not")
 )
 
-reviews_channel_inl = InlineKeyboardMarkup(
-).add(
-    InlineKeyboardButton("Наш канал", url="https://t.me/veshestvaINFO"),
-)
-
-reviews_channel_inl2 = InlineKeyboardMarkup(
-).add(
-    InlineKeyboardButton("Наш канал", url="https://t.me/joinchat/j4kUDvUV-owzNzUy"),
-)
-
 # Кнопки при поиске профиля через админ-меню
 profile_open_inl = InlineKeyboardMarkup(
 ).add(
     InlineKeyboardButton("💰 Пополнить", callback_data="user_refill"),
     InlineKeyboardButton("🎁 Мои покупки", callback_data="user_history")
-)
-
-# Отдельная кнопка пополнения
-profile_popoln_inl = InlineKeyboardMarkup(
-).add(
-    InlineKeyboardButton("💰 Пополнить", callback_data="user_refill1"),
 )
 
 # Удаление сообщения

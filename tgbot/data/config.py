@@ -5,8 +5,11 @@ read_config = configparser.ConfigParser()
 read_config.read("settings.ini")
 
 BOT_TOKEN = read_config['settings']['token'].strip().replace(" ", "")  # Токен бота
-GROUP_ID = int(read_config["settings"]["group_id"].strip().replace(" ", ""))
-ADMIN_ID = int(read_config["settings"]["admin_id"].strip().replace(" ", ""))
+CRYSTAL_PAY_SECRET_1 = read_config['settings']['crystalpay_secret_1']
+CRYSTAL_PAY_SECRET_2 = read_config['settings']['crystalpay_secret_2']
+CRYSTAL_PAY_LOGIN = read_config['settings']['crystalpay_login']
+
+
 PATH_DATABASE = "tgbot/data/database.db"  # Путь к БД
 PATH_LOGS = "tgbot/data/logs.log"  # Путь к Логам
 BOT_VERSION = "1.0"  # Версия бота
