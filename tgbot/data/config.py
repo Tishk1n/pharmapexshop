@@ -8,6 +8,7 @@ BOT_TOKEN = read_config['settings']['token'].strip().replace(" ", "")  # Ток�
 CRYSTAL_PAY_SECRET_1 = read_config['settings']['crystalpay_secret_1']
 CRYSTAL_PAY_SECRET_2 = read_config['settings']['crystalpay_secret_2']
 CRYSTAL_PAY_LOGIN = read_config['settings']['crystalpay_login']
+GROUP_ID = read_config['settings']['group_id']
 
 
 PATH_DATABASE = "tgbot/data/database.db"  # Путь к БД

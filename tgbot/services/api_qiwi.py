@@ -68,25 +68,17 @@ class QiwiAPI(AsyncClass):
                                          f"◾ Токен: <code>{self.token}</code>\n"
                                          f"◾ Приватный ключ: <code>{text_secret}</code>")
                 else:
-                    await self.error_wallet()
                     return False
             elif self.user_bill_pass:
                 if not status:
-                    await self.dp.edit_text(
-                        "<b>❗ Извиняемся за доставленные неудобства, пополнение временно недоступно.\n"
-                        "⌛ Попробуйте чуть позже.</b>")
-                    await self.error_wallet()
+                    pass
                     return False
             elif self.user_check_pass:
                 if not status:
-                    await self.dp.answer(
-                        "❗ Извиняемся за доставленные неудобства, проверка временно недоступна.\n"
-                        "⌛ Попробуйте чуть позже.", True)
-                    await self.error_wallet()
+                    pass
                     return False
             elif not status:
                 if not self.add_pass:
-                    await self.error_wallet()
                     return False
 
             return True

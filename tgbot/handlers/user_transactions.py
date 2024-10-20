@@ -10,6 +10,8 @@ from tgbot.services.api_sqlite import update_userx, get_refillx, add_refillx, ge
 from tgbot.services.crystal_payment import CrystalPay, CheckPaymentTyping
 from tgbot.utils.const_functions import get_date, get_unix
 from tgbot.utils.misc_functions import send_admins
+from tgbot.data.config import GROUP_ID
+from tgbot.data.loader import bot
 
 min_input_qiwi = 5  # Минимальная сумма пополнения в рублях
 
@@ -35,30 +37,16 @@ async def refill_way_choice(call: CallbackQuery, state: FSMContext):
     await state.set_state("here_pay_amount")
     await call.message.edit_text("<b>💰 Введите сумму пополнения</b>")
 
-
-###################################################################################
-#################################### ВВОД СУММЫ ###################################
-# Принятие суммы для пополнения средств через QIWI
-
-
 @dp.message_handler(state="here_pay_amount")
 async def refill_get(message: Message, state: FSMContext):
     if message.text.isdigit():
-        cache_message = await message.answer("<b>♻ Подождите, платёж генерируется...</b>")
+        cache_message = await message.answer("<b>♻ Совершите перевод:\nСбербанк: 1234 1234 1234 1234\nСБП +79958429441</b>")
         pay_amount = int(message.text)
         data = await state.get_data()
-        if data.get("here_pay_way") in 'crystalpay':
-            crystal_pay: CrystalPay = message.bot['crystal_pay']
-            payment_id, link = await crystal_pay.create_payment_url(pay_amount)
-
-            await message.answer(
-                text="Подтвердите платеж, как отправите.",
-                reply_markup=refill_bill_finl_crystal(link, payment_id)
-            )
-            await state.update_data(
-                crystal_payment_id=payment_id
-            )
-            return
+        await message.answer(
+            text="Подтвердите платеж, как отправите.",
+            reply_markup=refill_bill_finl_crystal()
+        )
 
         if min_input_qiwi <= pay_amount <= 300000:
             get_way = (await state.get_data())['here_pay_way']
@@ -175,3 +163,8 @@ async def refill_success(call: CallbackQuery, receipt, amount, get_way):
         f"💰 Сумма пополнения: <code>{amount}₽</code>\n"
         f"🧾 Чек: <code>#{receipt}</code>"
     )
+
+
+@dp.callback_query_handler(text='check_payment')
+async def send_payment_admins(call: CallbackQuery):
+    await bot.send_message(text="Пользователь совершил оплату", chat_id=GROUP_ID)

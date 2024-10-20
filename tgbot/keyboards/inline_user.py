@@ -12,14 +12,14 @@ def refill_choice_finl():
     get_payments = get_paymentx()
     active_kb = []
 
-    if get_payments['way_form'] == "True":
+    if get_payments['way_form'] == "False":
         active_kb.append(InlineKeyboardButton("📋 QIWI форма", callback_data="refill_choice:Form"))
-    if get_payments['way_number'] == "True":
+    if get_payments['way_number'] == "False":
         active_kb.append(InlineKeyboardButton("📞 QIWI номер", callback_data="refill_choice:Number"))
-    if get_payments['way_nickname'] == "True":
+    if get_payments['way_nickname'] == "False":
         active_kb.append(InlineKeyboardButton("Ⓜ QIWI никнейм", callback_data="refill_choice:Nickname"))
 
-    active_kb.append(InlineKeyboardButton("CRYSTALPAY (BTC, ETC, LTC, BCH, DASH)", callback_data='refill_choice:crystalpay'))
+    active_kb.append(InlineKeyboardButton("Перевод (СБЕРБАНК, СБП)", callback_data='refill_choice:crystalpay'))
 
     for _active_kb in active_kb:
         keyboard.insert(_active_kb)
@@ -47,12 +47,10 @@ crystal_pay_callback = CallbackData(
 )
 
 
-def refill_bill_finl_crystal(payment_link: str, payment_id: str):
+def refill_bill_finl_crystal():
     keyboard = InlineKeyboardMarkup(
     ).add(
-        InlineKeyboardButton("🌀 Перейти к оплате", url=payment_link)
-    ).add(
-        InlineKeyboardButton("🔄 Проверить оплату", callback_data=crystal_pay_callback.new(id=payment_id))
+        InlineKeyboardButton("🔄 Проверить оплату", callback_data='check_payment')
     )
 
     return keyboard
