@@ -1,1 +1,26 @@
-WARNING | 2024-10-20 17:17:06,530 | main.py:47 | BOT WAS STARTED
+WARNING | 2024-10-21 18:09:51,294 | main.py:48 | BOT WAS STARTED
+ERROR | 2024-10-21 18:11:15,689 | base_events.py:1771 | Task exception was never retrieved
+future: <Task finished name='Task-35' coro=<Dispatcher._process_polling_updates() done, defined at /Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/aiogram/dispatcher/dispatcher.py:407> exception=UnboundLocalError("cannot access local variable 'keyboard' where it is not associated with a value")>
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/aiogram/dispatcher/dispatcher.py", line 415, in _process_polling_updates
+    for responses in itertools.chain.from_iterable(await self.process_updates(updates, fast)):
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/aiogram/dispatcher/dispatcher.py", line 235, in process_updates
+    return await asyncio.gather(*tasks)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/aiogram/dispatcher/handler.py", line 117, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/aiogram/dispatcher/dispatcher.py", line 256, in process_update
+    return await self.message_handlers.notify(update.message)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/aiogram/dispatcher/handler.py", line 117, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/rodion/Documents/GitHub/narkoshop_volgograd/tgbot/handlers/main_start.py", line 122, in admin_panel
+    await message.answer("Админ панель", reply_markup=admin_kb(message.from_user.id))
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/rodion/Documents/GitHub/narkoshop_volgograd/tgbot/keyboards/reply_all.py", line 22, in admin_kb
+    return keyboard
+           ^^^^^^^^
+UnboundLocalError: cannot access local variable 'keyboard' where it is not associated with a value

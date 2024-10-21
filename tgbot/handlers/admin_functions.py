@@ -6,7 +6,7 @@ from aiogram.types import CallbackQuery, Message
 from aiogram.utils.exceptions import CantParseEntities
 
 from tgbot.data.loader import dp, bot
-from tgbot.keyboards.inline_admin import profile_search_finl, profile_search_return_finl
+from tgbot.keyboards.inline_admin import profile_search_finl, profile_search_return_finl, worker_profile_search_finl
 from tgbot.keyboards.inline_all import mail_confirm_inl
 from tgbot.services.api_sqlite import *
 from tgbot.utils.const_functions import is_number
@@ -25,7 +25,8 @@ async def functions_mail(message: Message, state: FSMContext):
 
 
 # Поиск профиля
-@dp.message_handler(IsAdmin(), text="👤 Поиск профиля 🔍", state="*")
+@dp.message_handler(text="👤 Поиск профиля 🔍", state="*")
+@dp.message_handler(text="Выдать баланс клиенту", state="*")
 async def functions_profile(message: Message, state: FSMContext):
     await state.finish()
 
@@ -68,6 +69,34 @@ async def functions_profile_get(message: Message, state: FSMContext):
         await state.finish()
         await message.answer(open_profile_admin(get_user['user_id']),
                              reply_markup=profile_search_finl(get_user['user_id']))
+    else:
+        await message.answer("<b>❌ Профиль не был найден</b>\n"
+                             "👤 Введите логин или айди пользователя.")
+        
+@dp.message_handler(state="here_profile")
+@dp.message_handler(text_startswith=".user")
+async def functions_profile_get(message: Message, state: FSMContext):
+    find_user = message.text
+
+    if ".user" in find_user:
+        find_user = message.text.split(" ")
+        if len(find_user) > 1:
+            find_user = find_user[1]
+        else:
+            await message.answer("<b>❌ Вы не указали логин или айди пользователя.</b>\n"
+                                 "👤 Введите логин или айди пользователя.")
+            return
+
+    if find_user.isdigit():
+        get_user = get_userx(user_id=find_user)
+    else:
+        if find_user.startswith("@"): find_user = find_user[1:]
+        get_user = get_userx(user_login=find_user.lower())
+
+    if get_user is not None:
+        await state.finish()
+        await message.answer(open_profile_admin(get_user['user_id']),
+                             reply_markup=worker_profile_search_finl(get_user['user_id']))
     else:
         await message.answer("<b>❌ Профиль не был найден</b>\n"
                              "👤 Введите логин или айди пользователя.")
@@ -208,7 +237,7 @@ async def functions_mail_make(message, call: CallbackQuery):
 
 ######################################## УПРАВЛЕНИЕ ПРОФИЛЕМ ########################################
 # Обновление профиля пользователя
-@dp.callback_query_handler(IsAdmin(), text_startswith="admin_user_refresh", state="*")
+@dp.callback_query_handler(text_startswith="admin_user_refresh", state="*")
 async def functions_profile_refresh(call: CallbackQuery, state: FSMContext):
     user_id = call.data.split(":")[1]
 
@@ -243,7 +272,7 @@ async def functions_profile_purchases(call: CallbackQuery, state: FSMContext):
 
 
 # Выдача баланса пользователю
-@dp.callback_query_handler(IsAdmin(), text_startswith="admin_user_balance_add", state="*")
+@dp.callback_query_handler(text_startswith="admin_user_balance_add", state="*")
 async def functions_profile_balance_add(call: CallbackQuery, state: FSMContext):
     user_id = call.data.split(":")[1]
 
@@ -267,7 +296,7 @@ async def functions_profile_balance_set(call: CallbackQuery, state: FSMContext):
 
 
 # Принятие суммы для выдачи баланса пользователю
-@dp.message_handler(IsAdmin(), state="here_profile_add")
+@dp.message_handler(state="here_profile_add")
 async def functions_profile_balance_add_get(message: Message, state: FSMContext):
     user_id = (await state.get_data())['here_profile']
 
@@ -290,8 +319,8 @@ async def functions_profile_balance_add_get(message: Message, state: FSMContext)
         f"<b>✅ Пользователю <a href='tg://user?id={get_user['user_id']}'>{get_user['user_name']}</a> "
         f"выдано <code>{message.text}₽</code></b>")
 
-    await message.bot.send_message(user_id, f"<b>💰 Вам было выдано <code>{message.text}₽</code></b>")
-    await message.answer(open_profile_admin(user_id), reply_markup=profile_search_finl(user_id))
+    await message.bot.send_message(user_id, f"<b>💰 Ваш баланс пополнен на <code>{message.text}₽</code></b>")
+    await message.answer(open_profile_admin(user_id), reply_markup=worker_profile_search_finl(user_id))
 
 
 # Принятие суммы для изменения баланса пользователя

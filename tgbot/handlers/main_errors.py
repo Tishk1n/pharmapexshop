@@ -8,7 +8,7 @@ from tgbot.utils.misc.bot_logging import bot_logger
 
 
 # Обработка телеграм ошибок
-@dp.errors_handler()
+# @dp.errors_handler()
 async def main_errors(update: Update, exception):
     get_data = None
 

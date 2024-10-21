@@ -1,4 +1,7 @@
 # - *- coding: utf- 8 - *-
+import sqlite3
+from tgbot.data.config import GROUP_ID, PATH_DATABASE
+
 from contextlib import suppress
 
 from aiogram.dispatcher import FSMContext
@@ -35,6 +38,24 @@ async def main_missed_callback(call: CallbackQuery, state: FSMContext):
 
 # Обработка всех неизвестных команд
 @dp.message_handler()
-async def main_missed_message(message: Message):
-    await message.answer("♦ Неизвестная команда.\n"
-                         "▶ Введите /start")
+async def main_missed_message(message: Message, state: FSMContext):
+    if '/start' in message.text:
+        referer_id = None
+        referer_name = None
+        if message.text != "/start":
+            info = message.text.split()
+            if len(info) >= 2 and info[1].split('_')[0].isdigit():
+                i = info[1].split('_')
+                referer_id = int(i[0])
+                referer_name = i[1]
+        with sqlite3.connect(PATH_DATABASE) as con:
+            con.execute(
+                "INSERT OR IGNORE INTO referral_system VALUES(?, ?, ?)", (message.from_user.id, referer_id, referer_name)
+            )
+        await state.finish()
+
+        await message.answer(f"🔸 Бот готов к использованию.\n🔸 Если не появились вспомогательные кнопки\n▶ Введите /start",reply_markup=menu_frep(message.from_user.id))
+        return
+        
+    #await message.answer(f"♦ Неизвестная команда.\n"
+    #                    "▶ Введите /start")

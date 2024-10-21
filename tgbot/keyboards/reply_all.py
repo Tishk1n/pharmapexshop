@@ -7,14 +7,15 @@ from tgbot.data.config import get_admins
 # Кнопки главного меню
 def menu_frep(user_id):
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-    keyboard.row("🛒 Каталог товаров 🛒")
-    keyboard.row("👤 Профиль")
-    keyboard.row("ℹ️ Информация и правила")
-    keyboard.row("💬 Наш чат", "💉 Наш канал")
-    #keyboard.row("🎁 Купить", "👤 Профиль", "🧮 Наличие товаров")
-    #keyboard.row("☎ Поддержка", "ℹ FAQ")
+    keyboard.row("🛒 Заказать", "💾 Профиль")
+    keyboard.row("🔸 Отзывы")
+    
+    return keyboard
 
+
+def admin_kb(user_id):
     if user_id in get_admins():
+        keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
         keyboard.row("🎁 Управление товарами", "📊 Статистика")
         keyboard.row("⚙ Настройки", "🔆 Общие функции", "🔑 Платежные системы")
 
@@ -24,7 +25,7 @@ def menu_frep(user_id):
 # Кнопки платежных систем
 def payments_frep():
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-    keyboard.row("🥝 Изменить QIWI 🖍", "🥝 Проверить QIWI ♻", "🥝 Баланс QIWI 👁")
+    keyboard.row("🥝 Изменить QIWI 🖍", "Изменить USDT", "Изменить карту")
     keyboard.row("⬅ Главное меню", "🖲 Способы пополнений")
 
     return keyboard
@@ -33,7 +34,7 @@ def payments_frep():
 # Кнопки общих функций
 def functions_frep(user_id):
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-    keyboard.row("👤 Поиск профиля 🔍", "📢 Рассылка", "🧾 Поиск чеков 🔍")
+    keyboard.row("👤 Поиск профиля 🔍", "📢 Рассылка")
     keyboard.row("⬅ Главное меню")
 
     return keyboard
@@ -62,3 +63,11 @@ def items_frep():
 # Завершение загрузки товаров
 finish_load_rep = ReplyKeyboardMarkup(resize_keyboard=True)
 finish_load_rep.row("📥 Закончить загрузку товаров")
+
+# Воркер панель
+def worker_frep(user_id):
+    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+    keyboard.row("Получить реферральную ссылку")
+    keyboard.row("Выдать баланс клиенту")
+
+    return keyboard

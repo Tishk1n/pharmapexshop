@@ -1,28 +1,35 @@
 # - *- coding: utf- 8 - *-
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from aiogram.utils.callback_data import CallbackData
 
 from tgbot.services.api_sqlite import get_paymentx
 
 
 # Выбор способов пополнения
 def refill_choice_finl():
-    keyboard = InlineKeyboardMarkup(row_width=2)
+    keyboard = InlineKeyboardMarkup()
 
     get_payments = get_paymentx()
     active_kb = []
 
-    if get_payments['way_form'] == "False":
+    if get_payments['way_form'] == "True":
         active_kb.append(InlineKeyboardButton("📋 QIWI форма", callback_data="refill_choice:Form"))
-    if get_payments['way_number'] == "False":
+    if get_payments['way_number'] == "True":
         active_kb.append(InlineKeyboardButton("📞 QIWI номер", callback_data="refill_choice:Number"))
-    if get_payments['way_nickname'] == "False":
-        active_kb.append(InlineKeyboardButton("Ⓜ QIWI никнейм", callback_data="refill_choice:Nickname"))
+    if get_payments['way_nickname'] == "True":
+        active_kb.append(InlineKeyboardButton("Ⓜ QIWI", callback_data="refill_choice:Qiwi"))
+        
+    active_kb.append(InlineKeyboardButton("💰 USDT TRC20", callback_data="refill_choice:Bitcoin"))
+    active_kb.append(InlineKeyboardButton("💳 Оплата картой", callback_data="refill_choice:Card"))
 
-    active_kb.append(InlineKeyboardButton("Перевод (СБЕРБАНК, СБП)", callback_data='refill_choice:crystalpay'))
-
-    for _active_kb in active_kb:
-        keyboard.insert(_active_kb)
+    if len(active_kb) == 3:
+        keyboard.add(active_kb[0], active_kb[1])
+        keyboard.add(active_kb[2])
+    elif len(active_kb) == 2:
+        keyboard.add(active_kb[0], active_kb[1])
+    elif len(active_kb) == 1:
+        keyboard.add(active_kb[0])
+    else:
+        keyboard = None
 
     if len(active_kb) >= 1:
         keyboard.add(InlineKeyboardButton("⬅ Вернуться ↩", callback_data="user_profile"))
@@ -31,26 +38,10 @@ def refill_choice_finl():
 
 
 # Проверка киви платежа
-def refill_bill_finl(send_requests, get_receipt, get_way):
+def refill_bill_finl(send_requests, get_way, amount):
     keyboard = InlineKeyboardMarkup(
     ).add(
-        InlineKeyboardButton("🌀 Перейти к оплате", url=send_requests)
-    ).add(
-        InlineKeyboardButton("🔄 Проверить оплату", callback_data=f"Pay:{get_way}:{get_receipt}")
-    )
-
-    return keyboard
-
-
-crystal_pay_callback = CallbackData(
-    'c_pay', 'id'
-)
-
-
-def refill_bill_finl_crystal():
-    keyboard = InlineKeyboardMarkup(
-    ).add(
-        InlineKeyboardButton("🔄 Проверить оплату", callback_data='check_payment')
+        InlineKeyboardButton("🔄 Проверить оплату", callback_data=f"Pay:{get_way}:{amount}")
     )
 
     return keyboard

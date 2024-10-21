@@ -5,12 +5,10 @@ read_config = configparser.ConfigParser()
 read_config.read("settings.ini")
 
 BOT_TOKEN = read_config['settings']['token'].strip().replace(" ", "")  # Токен бота
-CRYSTAL_PAY_SECRET_1 = read_config['settings']['crystalpay_secret_1']
-CRYSTAL_PAY_SECRET_2 = read_config['settings']['crystalpay_secret_2']
-CRYSTAL_PAY_LOGIN = read_config['settings']['crystalpay_login']
-GROUP_ID = read_config['settings']['group_id']
-
-
+GROUP_ID = int(read_config["settings"]["group_id"].strip().replace(" ", ""))
+ADMIN_ID = int(read_config["settings"]["admin_id"].strip().replace(" ", ""))
+WORKER_WORD = str(read_config["settings"]["worker_word"].strip().replace(" ", ""))
+CHANNEL_LINK = str(read_config["settings"]["link_channel"].strip().replace(" ", ""))
 PATH_DATABASE = "tgbot/data/database.db"  # Путь к БД
 PATH_LOGS = "tgbot/data/logs.log"  # Путь к Логам
 BOT_VERSION = "1.0"  # Версия бота
@@ -43,6 +41,5 @@ def get_admins():
 
 # УДАЛИШЬ ИЛИ ИЗМЕНИШЬ ССЫЛКИ НА ДОНАТ, КАНАЛ И ТЕМУ БОТА - КАСТРИРУЮ БЛЯТЬ <3
 BOT_DESCRIPTION = f"""
-Бот создан Студией Программировании @freelance_phoenix_bot
 Версия бота {BOT_VERSION}
 """.strip()

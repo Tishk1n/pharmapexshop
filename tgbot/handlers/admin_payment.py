@@ -1,15 +1,33 @@
 # - *- coding: utf- 8 - *-
 import asyncio
+import json
 
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
 
 from tgbot.data.loader import dp
 from tgbot.keyboards.inline_admin import payment_choice_finl
+from tgbot.keyboards.reply_all import payments_frep, settings_frep, functions_frep, items_frep
 from tgbot.services.api_qiwi import QiwiAPI
 from tgbot.services.api_sqlite import update_paymentx, get_paymentx
 from tgbot.utils.misc.bot_filters import IsAdmin
 
+def getSettings():
+    file = open("config.json", "r")
+    data = json.loads(file.read())
+    file.close()
+    return data
+
+def updateSettinsg(arg, value):
+    get_settings = getSettings()
+    get_settings[arg] = value
+    result = get_settings
+    saveSettings(result)
+
+def saveSettings(arg):
+    file = open("config.json", "wb")
+    file.write(json.dumps(arg).encode("utf-8", "ignore"))
+    file.close()
 
 ###################################################################################
 ############################# ВЫБОР СПОСОБА ПОПОЛНЕНИЯ ############################
@@ -65,6 +83,22 @@ async def payment_qiwi_edit(message: Message, state: FSMContext):
     await state.set_state("here_qiwi_login")
     await message.answer("<b>🥝 Введите <code>номер (через +7, +380)</code> QIWI кошелька 🖍</b>")
 
+# Изменение QIWI кошелька
+@dp.message_handler(IsAdmin(), text="Изменить USDT", state="*")
+async def payment_qiwi_edit(message: Message, state: FSMContext):
+    await state.finish()
+
+    await state.set_state("here_change_bitcoin")
+    await message.answer("<b>Введите <code>адрес</code> кошелька 🖍</b>")
+
+# Изменение QIWI кошелька
+@dp.message_handler(IsAdmin(), text="Изменить карту", state="*")
+async def payment_qiwi_edit(message: Message, state: FSMContext):
+    await state.finish()
+
+    await state.set_state("here_change_card")
+    await message.answer("<b>Введите <code>номер</code> карты 🖍</b>")
+
 
 # Проверка работоспособности QIWI
 @dp.message_handler(IsAdmin(), text="🥝 Проверить QIWI ♻", state="*")
@@ -88,14 +122,9 @@ async def payment_qiwi_balance(message: Message, state: FSMContext):
 async def payment_qiwi_edit_login(message: Message, state: FSMContext):
     if message.text.startswith("+"):
         await state.update_data(here_qiwi_login=message.text)
-
-        await state.set_state("here_qiwi_token")
-        await message.answer(
-            "<b>🥝 Введите <code>токен API</code> QIWI кошелька 🖍</b>\n"
-            "❕ Получить можно тут 👉 <a href='https://qiwi.com/api'><b>Нажми на меня</b></a>\n"
-            "❕ При получении токена, ставьте только первые 3 галочки.",
-            disable_web_page_preview=True
-        )
+        updateSettinsg("qiwi", message.text)
+        await message.answer("<b>Сохранено.</b>", reply_markup=payments_frep())
+        await state.finish()
     else:
         await message.answer("<b>❌ Номер должен начинаться с + <code>(+7..., +380...)</code></b>\n"
                              "🥝 Введите <code>номер (через +7, +380)</code> QIWI кошелька 🖍")
@@ -114,7 +143,6 @@ async def payment_qiwi_edit_token(message: Message, state: FSMContext):
         disable_web_page_preview=True
     )
 
-
 # Принятие приватного ключа для QIWI
 @dp.message_handler(IsAdmin(), state="here_qiwi_secret")
 async def payment_qiwi_edit_secret(message: Message, state: FSMContext):
@@ -131,3 +159,15 @@ async def payment_qiwi_edit_secret(message: Message, state: FSMContext):
     await asyncio.sleep(0.5)
 
     await (await QiwiAPI(cache_message, qiwi_login, qiwi_token, qiwi_secret, True)).pre_checker()
+
+@dp.message_handler(IsAdmin(), state="here_change_bitcoin")
+async def payment_qiwi_edit_secret(message: Message, state: FSMContext):
+    updateSettinsg("bitcoin", message.text)
+    await message.answer("<b>Сохранено.</b>", reply_markup=payments_frep())
+    await state.finish()
+
+@dp.message_handler(IsAdmin(), state="here_change_card")
+async def payment_qiwi_edit_secret(message: Message, state: FSMContext):
+    updateSettinsg("card", message.text)
+    await message.answer("<b>Сохранено.</b>", reply_markup=payments_frep())
+    await state.finish()

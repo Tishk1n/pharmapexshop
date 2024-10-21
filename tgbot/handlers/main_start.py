@@ -1,12 +1,19 @@
 # - *- coding: utf- 8 - *-
+import sqlite3
+import re
+
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, CallbackQuery
+from aiogram.types import ChatMemberMember
 
+from tgbot.data.config import GROUP_ID, PATH_DATABASE, ADMIN_ID
 from tgbot.data.loader import dp
 from tgbot.keyboards.inline_user import user_support_finl
-from tgbot.keyboards.reply_all import menu_frep
+from tgbot.keyboards.reply_all import menu_frep, admin_kb
 from tgbot.services.api_sqlite import get_settingsx, get_userx
 from tgbot.utils.misc.bot_filters import IsBuy, IsRefill, IsWork
+from tgbot.keyboards.inline_all import reviews_channel_inl2
+from tgbot.data.loader import bot
 
 # Игнор-колбэки покупок
 prohibit_buy = ['buy_category_open', 'buy_category_swipe', 'buy_position_open', 'buy_position_swipe',
@@ -46,7 +53,7 @@ async def filter_work_callback(call: CallbackQuery, state: FSMContext):
 ####################################################################################################
 ########################################### СТАТУС ПОКУПОК #########################################
 # Фильтр на доступность покупок - сообщение
-@dp.message_handler(IsBuy(), text="🛒 Каталог товаров 🛒", state="*")
+@dp.message_handler(IsBuy(), text="🛒 Купить", state="*")
 @dp.message_handler(IsBuy(), state="here_item_count")
 async def filter_buy_message(message: Message, state: FSMContext):
     await state.finish()
@@ -85,9 +92,31 @@ async def filter_refill_callback(call: CallbackQuery, state: FSMContext):
 # Открытие главного меню
 @dp.message_handler(text=['⬅ Главное меню', '/start'], state="*")
 async def main_start(message: Message, state: FSMContext):
-    await state.finish()
+    user_status = await bot.get_chat_member(chat_id=GROUP_ID, user_id=message.from_user.id)
+    referer_id = None
+    referer_name = None
+    if isinstance(user_status, ChatMemberMember) or ADMIN_ID:
+        if "/start" in message.text:
+            await message.answer(f"🔸 Бот готов к использованию.\n🔸 Если не появились вспомогательные кнопки\n▶ Введите /start",reply_markup=menu_frep(message.from_user.id))
+        if message.text != "/start":
+            info = message.text.split()
+            if len(info) >= 3 and info[1].isdigit():
+                referer_id = int(info[1])
+                referer_name = info[2]
+        with sqlite3.connect(PATH_DATABASE) as con:
+            con.execute(
+                "INSERT OR IGNORE INTO referral_system VALUES(?, ?, ?)", (message.from_user.id, referer_id, referer_name)
+            )
+        await state.finish()
 
-    await message.answer("🔸 Бот готов к использованию.\n"
-                         "🔸 Если не появились вспомогательные кнопки\n"
-                         "▶ Введите /start",
-                         reply_markup=menu_frep(message.from_user.id))
+    else:
+           await bot.send_message(message.from_user.id, 'Чтобы пользоваться ботом, подпишись на канал', reply_markup=reviews_channel_inl)
+        
+@dp.message_handler(text='⬅️ Главное меню')
+async def back_in_main_menu(message: Message):
+    await message.answer(f"🔸 Бот готов к использованию.\n🔸 Если не появились вспомогательные кнопки\n▶ Введите /start",reply_markup=menu_frep(message.from_user.id))
+
+@dp.message_handler(text='/admin')
+@dp.message_handler(text='⬅️ Главное меню')
+async def admin_panel(message: Message):
+    await message.answer("Админ панель", reply_markup=admin_kb(message.from_user.id))

@@ -68,17 +68,25 @@ class QiwiAPI(AsyncClass):
                                          f"◾ Токен: <code>{self.token}</code>\n"
                                          f"◾ Приватный ключ: <code>{text_secret}</code>")
                 else:
+                    await self.error_wallet()
                     return False
             elif self.user_bill_pass:
                 if not status:
-                    pass
+                    await self.dp.edit_text(
+                        "<b>❗ Извиняемся за доставленные неудобства, пополнение временно недоступно.\n"
+                        "⌛ Попробуйте чуть позже.</b>")
+                    await self.error_wallet()
                     return False
             elif self.user_check_pass:
                 if not status:
-                    pass
+                    await self.dp.answer(
+                        "❗ Извиняемся за доставленные неудобства, проверка временно недоступна.\n"
+                        "⌛ Попробуйте чуть позже.", True)
+                    await self.error_wallet()
                     return False
             elif not status:
                 if not self.add_pass:
+                    await self.error_wallet()
                     return False
 
             return True
@@ -221,6 +229,8 @@ class QiwiAPI(AsyncClass):
         if response:
             bill_receipt = str(int(time.time() * 100))
 
+            print(get_way)
+
             if get_way == "Form":
                 qiwi_p2p = await QiwiAPIp2p(self.dp, self.secret)
                 bill_id, bill_url = await qiwi_p2p.bill(get_amount, bill_id=bill_receipt, lifetime=60)
@@ -250,15 +260,13 @@ class QiwiAPI(AsyncClass):
                                🔄 После оплаты, нажмите на <code>Проверить оплату</code>
                                """)
             elif get_way == "Nickname":
-                bill_url = f"https://qiwi.com/payment/form/99999?amountInteger={get_amount}&amountFraction=0&currency=643&extra%5B%27comment%27%5D={bill_receipt}&extra%5B%27account%27%5D={self.nickname}&blocked%5B0%5D=comment&blocked%5B1%5D=account&blocked%5B2%5D=sum&0%5Bextra%5B%27accountType%27%5D%5D=nickname"
-
                 bill_message = ded(f"""
                                <b>💰 Пополнение баланса</b>
                                ➖➖➖➖➖➖➖➖➖➖
                                🥝 Для пополнения баланса, нажмите на кнопку ниже 
                                <code>Перейти к оплате</code> и оплатите выставленный вам счёт
                                ❗ Не забудьте указать <u>КОММЕНТАРИЙ</u> к платежу
-                               Ⓜ QIWI Никнейм: <code>{self.nickname}</code>
+                               Ⓜ QIWI: <code>{self.nickname}</code>
                                🏷 Комментарий: <code>{bill_receipt}</code>
                                💰 Сумма пополнения: <code>{get_amount}₽</code>
                                ➖➖➖➖➖➖➖➖➖➖

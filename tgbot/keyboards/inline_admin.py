@@ -19,6 +19,14 @@ def profile_search_finl(user_id):
 
     return keyboard
 
+def worker_profile_search_finl(user_id):
+    keyboard = InlineKeyboardMarkup(
+    ).add(
+        ikb("💰 Выдать баланс", callback_data=f"admin_user_balance_add:{user_id}")
+    )
+
+    return keyboard
+
 
 # Возвращение к профилю
 def profile_search_return_finl(user_id):
